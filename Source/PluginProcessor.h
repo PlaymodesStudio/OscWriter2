@@ -70,6 +70,7 @@ public:
 
 private:
     std::vector<AudioParameterFloat*> floatParameters;
+    std::vector<AudioParameterBool*>  boolParameters;
     StringArray  oscAddresses;
     String oscHost;
     String oscPort;

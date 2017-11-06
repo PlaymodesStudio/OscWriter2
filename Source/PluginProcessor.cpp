@@ -11,7 +11,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#define PARAMETERSIZE = 4;
+#define FLOATPARAMETERSIZE 7
+#define FLAGPARAMETERSIZE 3
 
 //==============================================================================
 OscWriter2AudioProcessor::OscWriter2AudioProcessor()
@@ -26,14 +27,20 @@ OscWriter2AudioProcessor::OscWriter2AudioProcessor()
                        )
 #endif
 {
-    for(int i = 0; i < 4; i++){
-        floatParameters.push_back(new AudioParameterFloat("Parameter" + String(i), "Parameter " + String(i), 0.0, 1.0, 0.0));
+    for(int i = 0; i < FLOATPARAMETERSIZE; i++){
+        floatParameters.push_back(new AudioParameterFloat("Float Parameter" + String(i), "Parameter " + String(i), 0.0, 1.0, 0.0));
         addParameter(floatParameters.back());
         
         oscAddresses.add("/param" + String(i));
-        oscHost = "127.0.0.1";
-        oscPort = "12345";
     }
+    for(int i = 0; i < FLAGPARAMETERSIZE; i++){
+        boolParameters.push_back(new AudioParameterBool("Bool Parameter" + String(i), "Bool Parameter " + String(i), false));
+        addParameter(boolParameters.back());
+        
+        oscAddresses.add("/flag" + String(i));
+    }
+    oscHost = "127.0.0.1";
+    oscPort = "12345";
     newPresetLoadFlag = false;
 }
 

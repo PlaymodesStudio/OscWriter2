@@ -41,7 +41,25 @@ OscWriter2AudioProcessorEditor::OscWriter2AudioProcessorEditor (OscWriter2AudioP
             aLabel->addListener (this);
             addAndMakeVisible (aLabel);
         }
+        
+        if (const AudioParameterBool* param = dynamic_cast<AudioParameterBool*>(params[i]))
+        {
+            ToggleButton* aToggle;
+            
+            paramToggles.add(aToggle = new ToggleButton(param->name));
+            aToggle->setEnabled(false);
+            aToggle->addListener(this);
+            addAndMakeVisible(aToggle);
+            
+            TextEditor* aLabel;
+            paramLabels.add (aLabel = new TextEditor (param->name));
+            aLabel->setText(p.getOscAddressByIndex(i));
+            aLabel->addListener (this);
+            addAndMakeVisible (aLabel);
+        }
     }
+    
+    flagChecker.resize(paramLabels.size()-paramSliders.size(), false);
 
     oscHostField = new TextEditor("oscHost");
     oscPortField = new TextEditor("oscPort");
@@ -53,12 +71,13 @@ OscWriter2AudioProcessorEditor::OscWriter2AudioProcessorEditor (OscWriter2AudioP
     addAndMakeVisible(oscPortField);
     
     setSize (kParamSliderWidth + kParamLabelWidth,
-             jmax (1, kParamSliderHeight * paramSliders.size()) + kParamSliderHeight);
+             jmax (1, kParamSliderHeight * paramLabels.size()) + kParamSliderHeight);
     
 
     startTimer(16);
     
     sender.connect(oscHostField->getText(), oscPortField->getText().getIntValue());
+    logo = ImageCache::getFromMemory(BinaryData::anagrama_png, BinaryData::anagrama_pngSize);
     
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -73,7 +92,9 @@ void OscWriter2AudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-//
+    
+//    g.drawImageAt(logo, getLocalBounds().getCentreX(), 10);
+    g.drawImage(logo, getLocalBounds().getCentreX(), 10, 30, 30, 0, 0, logo.getWidth(), logo.getHeight());
 //    g.setColour (Colours::white);
 //    g.setFont (15.0f);
 //    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
@@ -102,6 +123,14 @@ void OscWriter2AudioProcessorEditor::resized()
         
         paramLabels[i]->setBounds (labelBounds);
         paramSliders[i]->setBounds (paramBounds);
+    }
+    for (int i = paramSliders.size(); i < paramLabels.size(); i++){
+        Rectangle<int> paramBounds = r.removeFromTop (kParamSliderHeight);
+        Rectangle<int> labelBounds = paramBounds.removeFromLeft (kParamLabelWidth);
+        labelBounds.reduce(0, 10);
+        
+        paramToggles[i-paramSliders.size()]->setBounds(paramBounds);
+        paramLabels[i]->setBounds (labelBounds);
     }
 }
 
@@ -137,15 +166,39 @@ void OscWriter2AudioProcessorEditor::textEditorFocusLost(TextEditor &editor)
     }
 }
 
+void OscWriter2AudioProcessorEditor::buttonStateChanged(Button* button)
+{
+    const int index = paramToggles.indexOf(dynamic_cast<const ToggleButton*>(button));
+    if(AudioProcessorParameter* param = getAudioProcessor()->getParameters()[index + paramSliders.size()]){
+        if (const AudioParameterBool* boolparam = dynamic_cast<AudioParameterBool*>(param))
+        {
+            param->setValue((float)button->getToggleState());
+        }
+    }
+}
+
 void OscWriter2AudioProcessorEditor::timerCallback()
 {
     const OwnedArray<AudioProcessorParameter>& params = getAudioProcessor()->getParameters();
     for (int i = 0; i < params.size(); ++i)
     {
-        if (const AudioProcessorParameter* param = params[i])
+        if (const AudioParameterFloat* param = dynamic_cast<AudioParameterFloat*>(params[i]))
         {
             if (i < paramSliders.size())
-                paramSliders[i]->setValue (param->getValue());
+                paramSliders[i]->setValue (param->get());
+        }
+        
+        if (const AudioParameterBool* param = dynamic_cast<AudioParameterBool*>(params[i]))
+        {
+            if(param->get() == true){
+                if(flagChecker[i-paramSliders.size()] == false){
+                    sender.send(paramLabels[i]->getText());
+                    flagChecker[i-paramSliders.size()] = true;
+                }
+            }
+            else{
+                flagChecker[i-paramSliders.size()] = false;
+            }
         }
     }
     if(processor.getFlag())

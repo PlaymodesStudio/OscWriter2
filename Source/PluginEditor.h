@@ -19,6 +19,7 @@
 */
 class OscWriter2AudioProcessorEditor  : public AudioProcessorEditor,
                                         public Slider::Listener,
+                                        public ToggleButton::Listener,
                                         public TextEditor::Listener,
                                         public Timer
 {
@@ -40,6 +41,9 @@ public:
     void sliderValueChanged (Slider* slider) override;
     void textEditorTextChanged (TextEditor& editor) override;
     void textEditorFocusLost (TextEditor& editor) override;
+    
+    void buttonClicked (Button* button) override{};
+    void buttonStateChanged (Button* button) override;
 
 private:
     void timerCallback() override;
@@ -51,10 +55,14 @@ private:
     }
     
     OwnedArray<Slider> paramSliders;
+    OwnedArray<ToggleButton>    paramToggles;
     OwnedArray<TextEditor> paramLabels;
     OSCSender sender;
     TextEditor* oscHostField;
     TextEditor* oscPortField;
+    std::vector<bool> flagChecker;
+    
+    Image logo;
     
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
