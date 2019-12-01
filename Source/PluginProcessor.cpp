@@ -11,8 +11,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#define FLOATPARAMETERSIZE 7
-#define FLAGPARAMETERSIZE 3
+#define FLOATPARAMETERSIZE 8
+#define FLAGPARAMETERSIZE 2
 
 //==============================================================================
 OscWriter2AudioProcessor::OscWriter2AudioProcessor()
@@ -41,6 +41,7 @@ OscWriter2AudioProcessor::OscWriter2AudioProcessor()
     }
     oscHost = "127.0.0.1";
     oscPort = "12345";
+    presetName = "Initial_Bank/1--Init";
     newPresetLoadFlag = false;
 }
 
@@ -170,6 +171,9 @@ void OscWriter2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
 
         // ..do something to the data...
     }
+    
+    playHead = this->getPlayHead();
+    playHead->getCurrentPosition (currentPositionInfo);
 }
 
 //==============================================================================
@@ -194,8 +198,9 @@ void OscWriter2AudioProcessor::getStateInformation (MemoryBlock& destData)
     for (int i = 0; i < oscAddresses.size(); i++){
         stream.writeString (oscAddresses[i]);
     }
-    stream.writeString(oscHost);
-    stream.writeString(oscPort);
+    stream.writeString("127.0.0.1"); //This is not used, but is keep for compatibility
+    stream.writeString("12345"); //This is not used, but is keep for compatibility
+    stream.writeString(presetName);
 }
 
 void OscWriter2AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -207,8 +212,9 @@ void OscWriter2AudioProcessor::setStateInformation (const void* data, int sizeIn
     for (int i = 0; i < oscAddresses.size(); i++){
         oscAddresses.set(i, stream.readString());
     }
-    oscHost = stream.readString();
-    oscPort = stream.readString();
+    String sillyOscHost = stream.readString(); //This is not used, but is keep for compatibility
+    String sillyOscPort = stream.readString(); //This is not used, but is keep for compatibility
+    presetName = stream.readString();
     newPresetLoadFlag = true;
 }
 
@@ -232,6 +238,13 @@ bool OscWriter2AudioProcessor::getFlag()
 
 void OscWriter2AudioProcessor::setFlagFalse(){
     newPresetLoadFlag = false;
+}
+
+float OscWriter2AudioProcessor::getBpm(){
+    if(playHead != nullptr){
+        return currentPositionInfo.bpm;
+    }
+    return 0;
 }
 
 //==============================================================================

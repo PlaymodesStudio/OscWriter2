@@ -60,7 +60,10 @@ private:
     OSCSender sender;
     TextEditor* oscHostField;
     TextEditor* oscPortField;
+    TextEditor* generatorPreset;
+    Label* presetlabel;
     std::vector<bool> flagChecker;
+    float oldBpm;
     
     Image logo;
     

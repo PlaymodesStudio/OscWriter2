@@ -70,14 +70,25 @@ OscWriter2AudioProcessorEditor::OscWriter2AudioProcessorEditor (OscWriter2AudioP
     addAndMakeVisible(oscHostField);
     addAndMakeVisible(oscPortField);
     
+    generatorPreset = new TextEditor("Preset");
+    generatorPreset->setText(p.getPresetName());
+    generatorPreset->addListener(this);
+    addAndMakeVisible(generatorPreset);
+    
+    presetlabel = new Label("Preset");
+    presetlabel->setText("Preset ->", juce::dontSendNotification);
+    addAndMakeVisible(presetlabel);
+    
     setSize (kParamSliderWidth + kParamLabelWidth,
-             jmax (1, kParamSliderHeight * paramLabels.size()) + kParamSliderHeight);
+             jmax (1, kParamSliderHeight * (paramLabels.size()+1)) + kParamSliderHeight);
     
 
     startTimer(16);
     
     sender.connect(oscHostField->getText(), oscPortField->getText().getIntValue());
-    logo = ImageCache::getFromMemory(BinaryData::anagrama_png, BinaryData::anagrama_pngSize);
+    logo = ImageCache::getFromMemory(BinaryData::anagrama_sol_2_png, BinaryData::anagrama_sol_2_pngSize);
+    
+    oldBpm = 0.0;
     
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -94,7 +105,7 @@ void OscWriter2AudioProcessorEditor::paint (Graphics& g)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     
 //    g.drawImageAt(logo, getLocalBounds().getCentreX(), 10);
-    g.drawImage(logo, getLocalBounds().getCentreX(), 10, 30, 30, 0, 0, logo.getWidth(), logo.getHeight());
+    g.drawImage(logo, getLocalBounds().getCentreX() - (20), 5, 40, 40, 0, 0, logo.getWidth(), logo.getHeight());
 //    g.setColour (Colours::white);
 //    g.setFont (15.0f);
 //    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
@@ -109,11 +120,17 @@ void OscWriter2AudioProcessorEditor::resized()
     
     Rectangle<int> hostBounds = r.removeFromTop (kParamSliderHeight);
     Rectangle<int> portBounds = hostBounds.removeFromRight (kParamLabelWidth);
+    Rectangle<int> presetBounds = r.removeFromTop(kParamSliderHeight);
+    Rectangle<int> presetLabelBounds = presetBounds.removeFromLeft(70);
     hostBounds.setWidth(portBounds.getWidth());
     hostBounds.reduce(2, 10);
     portBounds.reduce(2, 10);
+    presetBounds.reduce(2, 10);
+    presetLabelBounds.reduce(2, 10);
     oscHostField->setBounds(hostBounds);
     oscPortField->setBounds(portBounds);
+    generatorPreset->setBounds(presetBounds);
+    presetlabel->setBounds(presetLabelBounds);
     
     for (int i = 0; i < paramSliders.size(); ++i)
     {
@@ -143,7 +160,6 @@ void OscWriter2AudioProcessorEditor::sliderValueChanged (Slider* slider)
             param->setValueNotifyingHost ((float) slider->getValue());
         else{
             param->setValue ((float) slider->getValue());
-            sender.send(paramLabels[paramSliders.indexOf(slider)]->getText(), (float)param->getValue());
             String oscAddress = paramLabels[paramSliders.indexOf(slider)]->getText();
             if(oscAddress.isNotEmpty()){
                 sender.send(oscAddress, (float)param->getValue());
@@ -163,10 +179,14 @@ void OscWriter2AudioProcessorEditor::textEditorTextChanged(TextEditor &editor)
 void OscWriter2AudioProcessorEditor::textEditorFocusLost(TextEditor &editor)
 {
     if(paramLabels.indexOf(&editor) == -1){
-        sender.disconnect();
-        sender.connect(oscHostField->getText(), oscPortField->getText().getIntValue());
-        processor.setOscHost(oscHostField->getText());
-        processor.setOscPort(oscPortField->getText());
+        if(generatorPreset == &editor){
+            processor.setPresetName(generatorPreset->getText());
+        }else{
+            sender.disconnect();
+            sender.connect(oscHostField->getText(), oscPortField->getText().getIntValue());
+            processor.setOscHost(oscHostField->getText());
+            processor.setOscPort(oscPortField->getText());
+        }
     }
 }
 
@@ -207,6 +227,11 @@ void OscWriter2AudioProcessorEditor::timerCallback()
             }
         }
     }
+    float newBpm = processor.getBpm();
+    if(newBpm != oldBpm){
+        sender.send("/bpm", newBpm);
+        oldBpm = newBpm;
+    }
     if(processor.getFlag())
     {
         for(int  i = 0; i < paramLabels.size(); i ++)
@@ -218,6 +243,16 @@ void OscWriter2AudioProcessorEditor::timerCallback()
         }
         oscHostField->setText(processor.getOscHost());
         oscPortField->setText(processor.getOscPort());
+        generatorPreset->setText(processor.getPresetName());
+        sender.send("/presetLoad/" + generatorPreset->getText(), 0);
+        sender.send("/bpm", newBpm);
+        //Send all parameters
+        for(auto &slider : paramSliders){
+            String oscAddress = paramLabels[paramSliders.indexOf(slider)]->getText();
+            if(oscAddress.isNotEmpty()){
+                sender.send(oscAddress, (float)slider->getValue());
+            }
+        }
         processor.setFlagFalse();
     }
 }

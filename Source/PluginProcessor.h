@@ -67,6 +67,11 @@ public:
     
     String getOscPort(){return oscPort;};
     void setOscPort(String port){oscPort = port;};
+    
+    String getPresetName(){return presetName;};
+    void setPresetName(String preset){presetName = preset;};
+    
+    float getBpm();
 
 private:
     std::vector<AudioParameterFloat*> floatParameters;
@@ -74,6 +79,11 @@ private:
     StringArray  oscAddresses;
     String oscHost;
     String oscPort;
+    String presetName;
+    float BPM;
+    
+    AudioPlayHead* playHead;
+    AudioPlayHead::CurrentPositionInfo currentPositionInfo;
     
     bool newPresetLoadFlag;
     
