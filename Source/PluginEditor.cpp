@@ -144,6 +144,10 @@ void OscWriter2AudioProcessorEditor::sliderValueChanged (Slider* slider)
         else{
             param->setValue ((float) slider->getValue());
             sender.send(paramLabels[paramSliders.indexOf(slider)]->getText(), (float)param->getValue());
+            String oscAddress = paramLabels[paramSliders.indexOf(slider)]->getText();
+            if(oscAddress.isNotEmpty()){
+                sender.send(oscAddress, (float)param->getValue());
+            }
         }
     }
 }
@@ -192,7 +196,9 @@ void OscWriter2AudioProcessorEditor::timerCallback()
         {
             if(param->get() == true){
                 if(flagChecker[i-paramSliders.size()] == false){
-                    sender.send(paramLabels[i]->getText());
+                    if(paramLabels[i]->getText() != ""){
+                        sender.send(paramLabels[i]->getText());
+                    }
                     flagChecker[i-paramSliders.size()] = true;
                 }
             }
