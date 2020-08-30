@@ -28,7 +28,7 @@ OscWriter2AudioProcessor::OscWriter2AudioProcessor()
 #endif
 {
     for(int i = 0; i < FLOATPARAMETERSIZE; i++){
-        floatParameters.push_back(new AudioParameterFloat("Float Parameter" + String(i), "Parameter " + String(i), 0.0, 1.0, 0.0));
+        floatParameters.push_back(new AudioParameterFloat("Float Parameter" + String(i), "Parameter " + String(i), NormalisableRange<float>(0.0000f, 1.0000f), 0.0));
         addParameter(floatParameters.back());
         
         oscAddresses.add("/param" + String(i));

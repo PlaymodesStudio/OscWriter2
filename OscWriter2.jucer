@@ -3,16 +3,16 @@
 <JUCERPROJECT id="INvtxA" name="OscWriter2" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" projectType="audioplug" version="1.0.0"
               bundleIdentifier="com.playmodesstudio.OscWriter2" includeBinaryInAppConfig="1"
-              cppLanguageStandard="11" buildVST="1" buildVST3="0" buildAU="1"
+              cppLanguageStandard="11" buildVST="0" buildVST3="1" buildAU="0"
               buildAUv3="0" buildRTAS="0" buildAAX="0" buildStandalone="1"
               enableIAA="0" pluginName="OscWriter2" pluginDesc="OscWriter2"
               pluginManufacturer="playmodesstudio" pluginManufacturerCode="PMpm"
               pluginCode="oscw" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="OscWriter2AU" pluginRTASCategory="" aaxIdentifier="com.playmodesstudio.OscWriter2"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.1.2"
-              companyName="Playmodes Studio" companyWebsite="www.playmodes.com"
-              companyEmail="info@playmodes.com">
+              pluginAAXCategory="2" companyName="Playmodes Studio" companyWebsite="www.playmodes.com"
+              companyEmail="info@playmodes.com" pluginFormats="buildStandalone,buildVST3"
+              jucerFormatVersion="1" defines="JUCE_VST3_CAN_REPLACE_VST2=0">
   <MAINGROUP id="kX1bno" name="OscWriter2">
     <GROUP id="{B25764C8-F558-45BC-D7B2-750CE349851D}" name="Source">
       <FILE id="ghFPTc" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -24,35 +24,32 @@
       <FILE id="qnorgF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <FILE id="XIt5Wj" name="anagrama.png" compile="0" resource="1" file="Resources/anagrama.png"/>
-    <FILE id="xJQfmt" name="anagrama_sol_2.png" compile="0" resource="1"
-          file="../../../../../Dropbox/PLAYMODES_STUDIO/grafisme playmodes/anagrama_sol_2.png"/>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="OscWriter2"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="OscWriter2"
-                       osxSDK="10.10 SDK"/>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../modules"/>
-        <MODULEPATH id="juce_events" path="../../modules"/>
-        <MODULEPATH id="juce_graphics" path="../../modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../modules"/>
+        <MODULEPATH id="juce_video" path="../../juce"/>
+        <MODULEPATH id="juce_osc" path="../../juce"/>
+        <MODULEPATH id="juce_opengl" path="../../juce"/>
+        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
+        <MODULEPATH id="juce_graphics" path="../../juce"/>
+        <MODULEPATH id="juce_events" path="../../juce"/>
+        <MODULEPATH id="juce_data_structures" path="../../juce"/>
+        <MODULEPATH id="juce_cryptography" path="../../juce"/>
+        <MODULEPATH id="juce_core" path="../../juce"/>
+        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
+        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
+        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
+        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
+        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
         <MODULEPATH id="juce_gui_extra" path="../../modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../modules"/>
-        <MODULEPATH id="juce_video" path="../../modules"/>
-        <MODULEPATH id="juce_opengl" path="../../modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../modules"/>
-        <MODULEPATH id="juce_osc" path="../../modules"/>
       </MODULEPATHS>
-    </XCODE_MAC>
+    </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -73,8 +70,9 @@
     <MODULE id="juce_osc" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
+  <JUCEOPTIONS JUCE_QUICKTIME="disabled" JUCE_WEB_BROWSER="0"/>
   <LIVE_SETTINGS>
     <OSX/>
+    <LINUX/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>

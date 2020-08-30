@@ -50,7 +50,7 @@ private:
     
     AudioProcessorParameter* getParameterForSlider (Slider* slider)
     {
-        const OwnedArray<AudioProcessorParameter>& params = getAudioProcessor()->getParameters();
+        const juce::Array<AudioProcessorParameter*>& params = getAudioProcessor()->getParameters();
         return params[paramSliders.indexOf(slider)];
     }
     

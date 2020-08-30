@@ -16,7 +16,7 @@
 OscWriter2AudioProcessorEditor::OscWriter2AudioProcessorEditor (OscWriter2AudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p)
 {
-    const OwnedArray<AudioProcessorParameter>& params = p.getParameters();
+    const juce::Array<AudioProcessorParameter*>& params = p.getParameters();
     for (int i = 0; i < params.size(); ++i)
     {
         if (const AudioParameterFloat* param = dynamic_cast<AudioParameterFloat*>(params[i]))
@@ -86,7 +86,7 @@ OscWriter2AudioProcessorEditor::OscWriter2AudioProcessorEditor (OscWriter2AudioP
     startTimer(16);
     
     sender.connect(oscHostField->getText(), oscPortField->getText().getIntValue());
-    logo = ImageCache::getFromMemory(BinaryData::anagrama_sol_2_png, BinaryData::anagrama_sol_2_pngSize);
+    // logo = ImageCache::getFromMemory(BinaryData::anagrama_sol_2_png, BinaryData::anagrama_sol_2_pngSize);
     
     oldBpm = 0.0;
     
@@ -105,7 +105,7 @@ void OscWriter2AudioProcessorEditor::paint (Graphics& g)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     
 //    g.drawImageAt(logo, getLocalBounds().getCentreX(), 10);
-    g.drawImage(logo, getLocalBounds().getCentreX() - (20), 5, 40, 40, 0, 0, logo.getWidth(), logo.getHeight());
+    //g.drawImage(logo, getLocalBounds().getCentreX() - (20), 5, 40, 40, 0, 0, logo.getWidth(), logo.getHeight());
 //    g.setColour (Colours::white);
 //    g.setFont (15.0f);
 //    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
@@ -153,7 +153,7 @@ void OscWriter2AudioProcessorEditor::resized()
 
 void OscWriter2AudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
-    const OwnedArray<AudioProcessorParameter>& params = getAudioProcessor()->getParameters();
+    const juce::Array<AudioProcessorParameter*>& params = getAudioProcessor()->getParameters();
     if (AudioProcessorParameter* param = params[paramSliders.indexOf(slider)])
     {
         if (slider->isMouseButtonDown())
@@ -203,7 +203,7 @@ void OscWriter2AudioProcessorEditor::buttonStateChanged(Button* button)
 
 void OscWriter2AudioProcessorEditor::timerCallback()
 {
-    const OwnedArray<AudioProcessorParameter>& params = getAudioProcessor()->getParameters();
+    const juce::Array<AudioProcessorParameter*>& params = getAudioProcessor()->getParameters();
     for (int i = 0; i < params.size(); ++i)
     {
         if (const AudioParameterFloat* param = dynamic_cast<AudioParameterFloat*>(params[i]))
